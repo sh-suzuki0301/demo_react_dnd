@@ -30,7 +30,7 @@ class SortableList extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{marginTop: "10px", marginLeft: "10px", fontSize:"30px"}}>
         {(isAndroid() || isIOS()) && <CustomDragLayer />}
         {this.state.items.map(item => {
           return (
