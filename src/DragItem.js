@@ -5,29 +5,44 @@ const dragSource = DragSource(
   "item",
   {
     beginDrag(props) {
-      return props;
+      return {
+          id: props.id,
+          name: props.name,
+          originalIndex: props.findItem(props.id),
+      };
+  },
+
+  endDrag(props, monitor) {
+    const { id, originalIndex } = monitor.getItem()
+    const didDrop = monitor.didDrop()
+
+    if (!didDrop) {
+        props.onDrop(id, originalIndex)
     }
   },
-  (connect, monitor) => {
+}, (connect, monitor) => {
     return {
       connectDragSource: connect.dragSource(),
       connectDragPreview: connect.dragPreview(),
       isDragging: monitor.isDragging()
     };
-  }
-);
+});
 
-const dropTarget = DropTarget(
-  "item",
-  {
-    drop(dropProps, monitor) {
-      const dragProps = monitor.getItem();
-      if (dropProps.id !== dragProps.id) {
-        dragProps.onDrop(dragProps.id, dropProps.id);
+const dropTarget = DropTarget("item", {
+    canDrop() {
+        return false
+    },
+    hover(props, monitor) {
+      const draggedId = monitor.getItem().id
+      const overId = props.id
+
+      if (draggedId !== overId) {
+        const overIndex = props.findItem(overId)
+        props.onDrop(draggedId, overIndex)
       }
-    }
-  },
-  connect => {
+    },
+    
+  },connect => {
     return {
       connectDropTarget: connect.dropTarget()
     };
